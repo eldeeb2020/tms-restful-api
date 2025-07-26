@@ -10,7 +10,30 @@ class TaskRepository implements TaskRepositoryInterface
 {
     public function getAll(array $filters = []): LengthAwarePaginator
     {
-        
+        $user = $filters['user'];
+        $query = Task::with(['assignedUser', 'creator', 'dependencies']);
+
+        // Role-based filtering
+        if ($user->hasRole('user')) {
+            $query->where('assigned_to', $user->id);
+        }
+
+        // Filters
+        if ($filters['status']) {
+            $query->byStatus($filters['status']);
+        }
+
+        if ($filters['due_date_start'] || $filters['due_date_end']) {
+            $query->byDueDateRange($filters['due_date_start'], $filters['due_date_end']);
+        }
+
+        if ($filters['assigned_to'] && $user->hasRole('manager')) {
+            $query->byAssignedUser($filters['assigned_to']);
+        }
+
+        $tasks = $query->orderBy('created_at', 'desc')->paginate(15);
+
+        return $tasks;
     }
 
     public function findById(int $id): ?Task
