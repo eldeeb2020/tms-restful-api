@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Repositories\Interfaces\TaskRepositoryInterface;
 use App\Http\Resources\TaskResource;
 use Illuminate\Pagination\LengthAwarePaginator;
+use App\Http\Controllers\Controller;
 
 class TaskController extends Controller
 {
